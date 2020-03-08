@@ -1,0 +1,15 @@
+version: "3.3"
+services:
+  tandb-vote:
+    restart: always
+    build:
+      ./
+    env_file:
+      - variables.env
+    volumes:
+      - ./src:/application/src
+    command: ["/application/dev.sh"]
+    entrypoint: ["/application/wait-for-it.sh", "-s" , "-t", "60", "postgres-db:5432", "--"]
+
+networks:
+  backend:

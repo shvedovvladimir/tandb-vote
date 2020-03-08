@@ -1,0 +1,28 @@
+version: "3.3"
+services:
+  tandb-vote:
+    build:
+      ./
+    env_file:
+      - variables.env
+    ports:
+      - "9081:9081"
+    networks:
+      - backend
+    command: ["/application/start.sh"]
+
+  postgres-db:
+    image: postgres:12.1-alpine
+    restart: always
+    env_file:
+        - variables.env
+    networks:
+        - backend
+    volumes:
+        - ./db-data:/var/lib/postgresql/data
+        - ./init-db.sql:/docker-entrypoint-initdb.d/init-vote.sql
+    ports:
+        - "5432:5432"
+
+networks:
+  backend:
