@@ -2,12 +2,13 @@ import { Injectable, Inject } from '@nestjs/common';
 import { LOGGER } from '../../di-constants';
 import { ILogger } from '../../../common/logger';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { IVoteService, IVoteResponse, IVoteResultsResponse } from './vote.service.interface';
 import { VoteHistoryEntity } from '../../entities/typeorm/vote-history.entity';
 import { VoteForItemEntity } from '../../entities/typeorm/vote-for-item.entity';
 import { AccessKeyVoteItemEntity } from '../../entities/typeorm/access-key-vote-item.entity';
 import { ResultItemPositionEntity } from '../../entities/typeorm/result-item-position.entity';
+import { performance } from 'perf_hooks';
 
 @Injectable()
 export class VoteService implements IVoteService {
@@ -105,7 +106,6 @@ export class VoteService implements IVoteService {
                 this._loggerPrefix,
                 `Got error while vote`,
                 voteFor,
-                err, // trace
                 err.message,
             );
 
@@ -115,40 +115,38 @@ export class VoteService implements IVoteService {
 
     public async getVotedItemListForAccessKey(
         accessKeyId: number, limit: number, offset: number,
-    ): Promise<any[]> {
-        /* return this._resultItemPositionRepository.createQueryBuilder()
-          // .where('access_key_id = :accessKeyId', {accessKeyId})
-            .orderBy('votes', 'DESC')
-            //.leftJoinAndSelect('access_key_vote_item',)
-            .limit(limit)
-            .offset(offset)
-            .getRawMany();
-        */
+    ): Promise<IVoteResultsResponse[]> {
+        this._logger.debug(this._loggerPrefix, `Try get vote for access key: ${accessKeyId} ${offset}`);
 
-        const resp = await this._resultItemPositionRepository.createQueryBuilder()
-            .select('vote.vote_for_item_id', 'voteForItemId')
-            .addSelect('vote.position', 'position')
-            .addSelect('vote.item_name', 'name')
-            .addSelect('vote.votes', 'votes')
-            .from('result_item_position', 'vote')
-            .leftJoinAndSelect((subQuery: SelectQueryBuilder<VoteForItemEntity>) => {
-                return subQuery
-                    .select('v1.access_key_id')
-                    .addSelect('v1.vote_for_item_id', 'voteForItemId')
-                    .from('access_key_vote_item', 'v1');
-            }, 'v1', 'v1."voteForItemId" = vote.vote_for_item_id')
-            .where('v1.access_key_id = :accessKeyId', {accessKeyId})
-            .orderBy('vote.votes', 'DESC')
-            .limit(limit)
-            .offset(offset)
-            .getRawMany();
+        try {
+            const tStart = performance.now();
+            const resp = await this._resultItemPositionRepository.createQueryBuilder()
+                .select('votes')
+                .addSelect('item_position', 'position')
+                .addSelect('item_name', 'name')
+                .where(`vote_for_item_id = any(array(
+                    select vote_for_item_id
+                    from production.access_key_vote_item
+                    where access_key_id = :accessKeyId))
+                `, {accessKeyId})
+                .orderBy('"votes"', 'DESC')
+                .skip(offset)
+                .take(limit)
+                .getRawMany();
 
-        return resp.map((item) => {
-            return {
-                votes: item.votes,
-                position: item.position,
-                name: item.name,
-            };
-        });
+            const tEnd = performance.now();
+            this._logger
+                .debug(this._loggerPrefix, `got response for access key: ${accessKeyId}. Time: ${tEnd - tStart} ms`);
+
+            return resp;
+        } catch (err) {
+            this._logger.error(
+                this._loggerPrefix,
+                `Got error while getting vote result for access key: ${accessKeyId}`,
+                err.message,
+            );
+
+            throw err;
+        }
     }
 }

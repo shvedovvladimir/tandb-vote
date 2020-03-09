@@ -16,10 +16,10 @@ export class TandbAuthProxyService {
             console.log('############################################################_____', n);
             const promises = [];
             for (let i = 0; i < 40; i++) {
-                const steps = this.randomInt(5, 10);
+                const steps = this.randomInt(5, 40);
                 for (let j = 0; j < steps; j++) {
-                    const acc = this.randomInt(1, 5);
-                    const postfix = this.randomInt(1, 5000);
+                    const acc = this.randomInt(1, 1);
+                    const postfix = this.randomInt(1, 50000);
                     promises.push(this.ebash(postfix, acc));
                 }
             }
