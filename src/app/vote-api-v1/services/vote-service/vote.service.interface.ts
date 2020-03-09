@@ -15,5 +15,6 @@ export interface IVoteResultsResponse {
     votes: number;
     position: number;
     voteForItemId: number;
-    name: string;
+    itemName: string;
+    itemMeta: any;
 }

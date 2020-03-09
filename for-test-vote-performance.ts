@@ -15,10 +15,10 @@ export class TandbAuthProxyService {
         for (let n = 0; n < 35; n++) {
             console.log('############################################################_____', n);
             const promises = [];
-            for (let i = 0; i < 60; i++) {
-                const steps = this.randomInt(10, 20);
+            for (let i = 0; i < 40; i++) {
+                const steps = this.randomInt(5, 10);
                 for (let j = 0; j < steps; j++) {
-                    const acc = this.randomInt(1, 2);
+                    const acc = this.randomInt(1, 5);
                     const postfix = this.randomInt(1, 5000);
                     promises.push(this.ebash(postfix, acc));
                 }
@@ -39,7 +39,7 @@ export class TandbAuthProxyService {
                 voteFor: `string${counter}`,
                 accessKeyId: acc,
               },
-              timeout: 100000, retry: 3,
+              timeout: 900000, retry: 3,
             });
         } catch (err) {
             console.log('ERROR', err.code || err.message);

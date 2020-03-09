@@ -7,6 +7,7 @@ import { IVoteService, IVoteResponse, IVoteResultsResponse } from './vote.servic
 import { VoteHistoryEntity } from '../../entities/typeorm/vote-history.entity';
 import { VoteForItemEntity } from '../../entities/typeorm/vote-for-item.entity';
 import { AccessKeyVoteItemEntity } from '../../entities/typeorm/access-key-vote-item.entity';
+import { ResultItemPositionEntity } from '../../entities/typeorm/result-item-position.entity';
 
 @Injectable()
 export class VoteService implements IVoteService {
@@ -19,6 +20,8 @@ export class VoteService implements IVoteService {
         protected readonly _voteForItemRepository: Repository<VoteForItemEntity>,
         @InjectRepository(AccessKeyVoteItemEntity)
         protected readonly _accessKeyVoteItemEntityRepository: Repository<AccessKeyVoteItemEntity>,
+        @InjectRepository(ResultItemPositionEntity)
+        protected readonly _resultItemPositionRepository: Repository<ResultItemPositionEntity>,
         @Inject(LOGGER)
         private readonly _logger: ILogger,
     ) {}
@@ -33,8 +36,7 @@ export class VoteService implements IVoteService {
                 await entityManager
                     .getRepository(VoteForItemEntity)
                     .createQueryBuilder()
-                    .andWhere('"deleted_at" IS NULL')
-                    .setLock('pessimistic_write');
+                    .andWhere('"deleted_at" IS NULL');
 
                 voteForItem = await entityManager
                     .getRepository(VoteForItemEntity)
@@ -113,33 +115,40 @@ export class VoteService implements IVoteService {
 
     public async getVotedItemListForAccessKey(
         accessKeyId: number, limit: number, offset: number,
-    ): Promise<IVoteResultsResponse[]> {
-        return this._accessKeyVoteItemEntityRepository.createQueryBuilder()
-            .distinctOn(['vote.vote_for_item_id, votes'])
-            .select('vote.vote_for_item_id', 'voteForItemId')
-            .from('access_key_vote_item', 'vote')
-            .leftJoinAndSelect((subQuery: SelectQueryBuilder<VoteForItemEntity>) => {
-                return subQuery
-                    .select((subQuery: SelectQueryBuilder<VoteForItemEntity>) => {
-                        return subQuery
-                            .select('COUNT("votes") + 1', 'countV')
-                            .from((subQuery: SelectQueryBuilder<VoteForItemEntity>) => {
-                                return subQuery
-                                    .select('"votes"')
-                                    .from('vote_for_item', 'v2')
-                                    .where('v2.votes > v1.votes')
-                                    .groupBy('v2.votes');
-                            }, 'sq');
-                }, 'position')
-                .addSelect('v1.vote_for_item_id', 'voteForItemId')
-                .addSelect('v1.item_name', 'name')
-                .addSelect('v1.votes', 'votes')
-                .from('vote_for_item', 'v1');
-            }, 'v1', 'v1."voteForItemId" = vote.vote_for_item_id')
-            .where('vote.access_key_id = :accessKeyId', {accessKeyId})
+    ): Promise<any[]> {
+        /* return this._resultItemPositionRepository.createQueryBuilder()
+          // .where('access_key_id = :accessKeyId', {accessKeyId})
             .orderBy('votes', 'DESC')
+            //.leftJoinAndSelect('access_key_vote_item',)
             .limit(limit)
             .offset(offset)
             .getRawMany();
+        */
+
+        const resp = await this._resultItemPositionRepository.createQueryBuilder()
+            .select('vote.vote_for_item_id', 'voteForItemId')
+            .addSelect('vote.position', 'position')
+            .addSelect('vote.item_name', 'name')
+            .addSelect('vote.votes', 'votes')
+            .from('result_item_position', 'vote')
+            .leftJoinAndSelect((subQuery: SelectQueryBuilder<VoteForItemEntity>) => {
+                return subQuery
+                    .select('v1.access_key_id')
+                    .addSelect('v1.vote_for_item_id', 'voteForItemId')
+                    .from('access_key_vote_item', 'v1');
+            }, 'v1', 'v1."voteForItemId" = vote.vote_for_item_id')
+            .where('v1.access_key_id = :accessKeyId', {accessKeyId})
+            .orderBy('vote.votes', 'DESC')
+            .limit(limit)
+            .offset(offset)
+            .getRawMany();
+
+        return resp.map((item) => {
+            return {
+                votes: item.votes,
+                position: item.position,
+                name: item.name,
+            };
+        });
     }
 }
