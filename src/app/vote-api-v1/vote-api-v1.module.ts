@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { CommonModule } from '../common/common.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthController } from './controllers/auth.controller';
-import { serviceContainerModule, loggerProvider } from './auth-api-v1.providers';
+import { AuthController } from './controllers/vote.controller';
+import { serviceContainerModule, loggerProvider } from './vote-api-v1.providers';
 import { HealthCheckModule } from '../common/healthcheck/health-check.module';
 import configuration from '../../../config/configuration';
 import { ConfigModule } from '@nestjs/config';

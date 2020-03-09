@@ -1,4 +1,4 @@
-import { INestApplication, Logger } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ApplicationModule } from './app/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -22,7 +22,7 @@ async function bootstrap(): Promise<INestApplication> {
     const logger = app.get<ILogger>(LOGGER);
     logger.replaceConsole();
 
-    process.on('uncaughtException', function (err: Error): void {
+    process.on('uncaughtException', function(err: Error): void {
         logger.fatal('uncaughtException', err.message, err.stack);
     });
 

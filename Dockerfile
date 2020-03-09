@@ -56,7 +56,7 @@ RUN npm run build
 
 ENV NODE_ENV=production
 
-EXPOSE 9080
+EXPOSE 9082
 
 ADD start.sh start.sh
 ADD dev.sh dev.sh

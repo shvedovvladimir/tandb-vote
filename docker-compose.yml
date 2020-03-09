@@ -6,7 +6,7 @@ services:
     env_file:
       - variables.env
     ports:
-      - "9081:9081"
+      - "9082:9082"
     networks:
       - backend
     command: ["/application/start.sh"]

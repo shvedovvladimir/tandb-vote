@@ -1,34 +1,29 @@
 import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({
-    name: 'token',
+    name: 'vote_for_item',
 })
-export class TokenEntity {
+export class VoteForItemEntity {
     @PrimaryColumn({
-        name: 'token_id',
+        name: 'vote_for_item_id',
     })
-    public tokenId: number;
+    public voteForItemId: number;
 
     @Column({
-        name: 'access_key',
+        name: 'item_name',
     })
-    public accessKey: string;
-
-    @Column({
-        name: 'token_value',
-    })
-    public tokenValue: string;
-
-    @Column({
-        name: 'token_type',
-    })
-    public tokenType: string;
+    public itemName: string;
 
     @Column('jsonb', {
         nullable: true,
-        name: 'token_meta',
+        name: 'item_meta',
     })
-    public tokenMeta: any;
+    public itemMeta: number;
+
+    @Column({
+        name: 'votes',
+    })
+    public votes: number;
 
     @CreateDateColumn({
         name: 'created_at',
@@ -45,9 +40,4 @@ export class TokenEntity {
         name: 'deleted_at',
     })
     public deletedAt: Date | null;
-
-    @Column({
-        name: 'expires_in',
-    })
-    public expiresIn: number;
 }

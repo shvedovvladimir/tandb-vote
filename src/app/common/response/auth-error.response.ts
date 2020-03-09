@@ -1,4 +1,4 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from '../../vote-api-v1/controllers/node_modules/@nestjs/swagger';
+import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 
 export class AuthErrorResponse {
     @ApiModelProperty({

@@ -1,5 +1,9 @@
-import { TokenEntity } from './typeorm/token.entity';
+import { VoteForItemEntity } from './typeorm/vote-for-item.entity';
+import { VoteHistoryEntity } from './typeorm/vote-history.entity';
+import { AccessKeyVoteItemEntity } from './typeorm/access-key-vote-item.entity';
 
 export const entities = [
-    TokenEntity,
+    VoteForItemEntity,
+    VoteHistoryEntity,
+    AccessKeyVoteItemEntity,
 ];

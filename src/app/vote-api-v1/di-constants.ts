@@ -1,8 +1,8 @@
 // for DI constants
 
 export const DI_CONSTANTS = {
-    ITokenService: Symbol('ITokenService'),
-    IJwtService: Symbol('IJwtService'),
+    IVoteService: Symbol('IVoteService'),
+
 };
 
 export const LOGGER = Symbol('LOGGER');

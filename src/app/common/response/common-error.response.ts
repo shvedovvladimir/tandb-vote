@@ -1,4 +1,4 @@
-import { ApiModelProperty } from '../../vote-api-v1/controllers/node_modules/@nestjs/swagger';
+import { ApiModelProperty } from '@nestjs/swagger';
 
 export class CommonErrorResponse {
     @ApiModelProperty({
