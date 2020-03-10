@@ -19,8 +19,8 @@ import { VoteForDto } from '../dto/vote-for.dto';
 import { voteForJoiSchema } from '../schemas/vote-for.schemas';
 import { IVoteService, IVoteResponse } from '../services/vote-service/vote.service.interface';
 import { VoteResponse } from '../response/vote.response';
-import { limitOffsetJoiSchema } from '../schemas/limit-offset.schemas';
-import { LimitOffsetForDto } from '../dto/limit-offset.dto';
+import { GetResultDto } from '../dto/get-result.dto';
+import { getResultJoiSchema } from '../schemas/get-result.schemas';
 
 @Controller('api')
 @ApiUseTags('Vote service api')
@@ -81,10 +81,10 @@ export class AuthController extends AbstractController {
     })
     @HttpCode(HttpStatus.OK)
     public async result(
-        @Query(new JoiValidationPipe(limitOffsetJoiSchema)) limitOffsetForDto: LimitOffsetForDto,
+        @Query(new JoiValidationPipe(getResultJoiSchema)) getResultDto: GetResultDto,
     ): Promise<any> {
         const resp = await this._tandbAuthProxyService
-            .getVotedItemListForAccessKey(1, limitOffsetForDto.limit, limitOffsetForDto.offset);
+            .getVotedItemListForAccessKey(getResultDto.accessKeyId, getResultDto.limit, getResultDto.offset);
 
         return resp;
     }
