@@ -25,7 +25,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE VIEW production.result_item_position as select * from result_item_position_fn();
 
-ALTER TABLE production.result_item_position owner to postgres_app;
+ALTER TABLE production.result_item_position owner to postgres_app_tandb_vote;
 
 create index if not exists i__btree__vote_for_item_votes_idx
 	on vote_for_item (votes)

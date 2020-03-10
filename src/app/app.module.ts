@@ -1,6 +1,5 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { VoteApiV1Module } from './vote-api-v1/vote-api-v1.module';
-import { AuthController } from './vote-api-v1/controllers/vote.controller';
 import { ConfigModule } from '@nestjs/config';
 import configuration from '../../config/configuration';
 @Module({
@@ -11,13 +10,4 @@ import configuration from '../../config/configuration';
         }),
     ],
 })
-export class ApplicationModule implements NestModule {
-
-    public configure(consumer: MiddlewareConsumer): MiddlewareConsumer | void {
-        consumer
-            .apply()  // use middleware
-            .forRoutes(
-                AuthController,
-            );
-    }
-}
+export class ApplicationModule {}
