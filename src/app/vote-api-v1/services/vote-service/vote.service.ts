@@ -34,11 +34,6 @@ export class VoteService implements IVoteService {
             let voteForItem = null;
 
             const resp = await this._voteHistoryRepository.manager.transaction(async (entityManager) => {
-                await entityManager
-                    .getRepository(VoteForItemEntity)
-                    .createQueryBuilder()
-                    .andWhere('"deleted_at" IS NULL');
-
                 voteForItem = await entityManager
                     .getRepository(VoteForItemEntity)
                     .createQueryBuilder()
@@ -67,14 +62,14 @@ export class VoteService implements IVoteService {
                         .where('"item_name" = :voteFor', {voteFor})
                         .andWhere('"deleted_at" IS NULL')
                         .getOne();
-                }
-
-                await entityManager
+                } else {
+                    await entityManager
                     .getRepository(VoteForItemEntity)
                     .update(
                         { voteForItemId: voteForItem.voteForItemId },
                         { votes: Number(voteForItem.votes) + 1 },
                     );
+                }
 
                 const newVote = {
                     accessKeyId,
