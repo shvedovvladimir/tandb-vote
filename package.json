@@ -38,7 +38,7 @@
     "swagger-ui-express": "^4.1.2",
     "typeorm": "^0.2.18",
     "uuid": "^7.0.2",
-    "validator": "^12.2.0",
+    "validator": "^13.7.0",
     "winston": "^3.2.1",
     "winston-transport": "^4.3.0"
   },
